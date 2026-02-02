@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台股即時報價 | Taiwan Stock Technical Analysis</title>
+    <meta name="description" content="專業台股即時報價與技術分析系統，提供 K 線圖、KD、MACD、乖離率等技術指標">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Lightweight Charts -->
+    <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+    
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --bg-card: rgba(22, 27, 34, 0.8);
+            --border-color: #30363d;
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            --accent-primary: #58a6ff;
+            --accent-secondary: #1f6feb;
+            --success: #3fb950;
+            --danger: #f85149;
+            --warning: #d29922;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 40px rgba(88, 166, 255, 0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            top: -25%;
+            left: -25%;
+            background: 
+                radial-gradient(ellipse at 20% 80%, rgba(88, 166, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(118, 75, 162, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 40% 40%, rgba(79, 172, 254, 0.05) 0%, transparent 40%);
+            animation: bgMove 20s ease-in-out infinite;
+        }
+        
+        @keyframes bgMove {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(2%, 2%) rotate(1deg); }
+            66% { transform: translate(-1%, 1%) rotate(-1deg); }
+        }
+        
+        /* Header */
+        header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-3);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .logo h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: var(--gradient-3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Search */
+        .search-container {
+            flex: 1;
+            max-width: 500px;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .search-box:focus-within {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+        }
+        
+        .search-box input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .search-btn {
+            background: var(--gradient-3);
+            border: none;
+            color: white;
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+        }
+        
+        /* Main content */
+        main {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Stock info card */
+        .stock-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            display: none;
+        }
+        
+        .stock-card.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .stock-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .stock-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .stock-code {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            background: var(--bg-tertiary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+        }
+        
+        .stock-name {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        .stock-price-section {
+            text-align: right;
+        }
+        
+        .current-price {
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+        
+        .price-change {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .price-up { color: var(--danger); }  /* 台股紅漲 */
+        .price-down { color: var(--success); }  /* 台股綠跌 */
+        .price-flat { color: var(--text-secondary); }
+        
+        /* Stats grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        
+        .stat-item {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+        
+        /* Period selector */
+        .chart-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .period-selector {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg-tertiary);
+            padding: 0.25rem;
+            border-radius: 10px;
+        }
+        
+        .period-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .period-btn:hover {
+            color: var(--text-primary);
+        }
+        
+        .period-btn.active {
+            background: var(--accent-secondary);
+            color: white;
+        }
+        
+        /* Chart container */
+        .chart-section {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            display: none;
+        }
+        
+        .chart-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .chart-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .chart-title::before {
+            content: '';
+            width: 4px;
+            height: 16px;
+            background: var(--gradient-3);
+            border-radius: 2px;
+        }
+        
+        .chart-container {
+            width: 100%;
+            height: 400px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .indicator-chart {
+            height: 200px;
+        }
+        
+        /* Charts grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Popular stocks */
+        .popular-section {
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .popular-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        
+        .popular-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.625rem 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .popular-btn:hover {
+            background: var(--accent-secondary);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(88, 166, 255, 0.2);
+        }
+        
+        .popular-btn .code {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+        
+        /* Legend */
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 3px;
+            border-radius: 2px;
+        }
+        
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem;
+            color: var(--text-muted);
+        }
+        
+        .loading::after {
+            content: '';
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 0.75rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Error */
+        .error-message {
+            background: rgba(248, 81, 73, 0.1);
+            border: 1px solid rgba(248, 81, 73, 0.3);
+            color: var(--danger);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        /* MA Toggle */
+        .ma-toggles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .ma-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        
+        .ma-toggle.active {
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
+        }
+        
+        .ma-toggle .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+        
+        footer a {
+            color: var(--accent-primary);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">📈</div>
+                <h1>台股技術分析</h1>
+            </div>
+            
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="stockInput" placeholder="輸入股票代號 (如 2330、0050)" 
+                           autocomplete="off" maxlength="10">
+                    <button class="search-btn" onclick="searchStock()">查詢</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <main>
+        <!-- Popular stocks -->
+        <section class="popular-section">
+            <h2 class="section-title">🔥 熱門股票</h2>
+            <div class="popular-grid" id="popularGrid">
+                {% for code, name in popular_stocks.items() %}
+                <button class="popular-btn" onclick="searchStock('{{ code }}')">
+                    {{ name }}
+                    <span class="code">{{ code }}</span>
+                </button>
+                {% endfor %}
+            </div>
+        </section>
+        
+        <!-- Error message -->
+        <div class="error-message" id="errorMessage"></div>
+        
+        <!-- Stock info card -->
+        <section class="stock-card" id="stockCard">
+            <div class="stock-header">
+                <div class="stock-title">
+                    <span class="stock-code" id="stockCode"></span>
+                    <h2 class="stock-name" id="stockName"></h2>
+                </div>
+                <div class="stock-price-section">
+                    <div class="current-price" id="currentPrice"></div>
+                    <div class="price-change" id="priceChange"></div>
+                </div>
+            </div>
+            
+            <div class="stats-grid" id="statsGrid">
+                <!-- Stats will be populated by JS -->
+            </div>
+        </section>
+        
+        <!-- Chart controls -->
+        <div class="chart-controls chart-section" id="chartControls">
+            <div class="period-selector">
+                <button class="period-btn" data-period="1m">1月</button>
+                <button class="period-btn" data-period="3m">3月</button>
+                <button class="period-btn" data-period="6m">6月</button>
+                <button class="period-btn active" data-period="1y">1年</button>
+                <button class="period-btn" data-period="2y">2年</button>
+                <button class="period-btn" data-period="5y">5年</button>
+            </div>
+            
+            <div class="ma-toggles" id="maToggles">
+                <label class="ma-toggle active" data-ma="ma5">
+                    <span class="dot" style="background: #FF6B6B"></span>
+                    <span>5日</span>
+                </label>
+                <label class="ma-toggle active" data-ma="ma10">
+                    <span class="dot" style="background: #4ECDC4"></span>
+                    <span>10日</span>
+                </label>
+                <label class="ma-toggle active" data-ma="ma20">
+                    <span class="dot" style="background: #FFE66D"></span>
+                    <span>20日</span>
+                </label>
+                <label class="ma-toggle" data-ma="ma60">
+                    <span class="dot" style="background: #95E1D3"></span>
+                    <span>季線</span>
+                </label>
+                <label class="ma-toggle" data-ma="ma120">
+                    <span class="dot" style="background: #F38181"></span>
+                    <span>半年</span>
+                </label>
+                <label class="ma-toggle" data-ma="ma240">
+                    <span class="dot" style="background: #AA96DA"></span>
+                    <span>年線</span>
+                </label>
+            </div>
+        </div>
+        
+        <!-- Main candlestick chart -->
+        <section class="chart-section" id="mainChartSection">
+            <h3 class="chart-title">K 線圖</h3>
+            <div class="chart-container" id="mainChart"></div>
+        </section>
+        
+        <!-- Technical indicators -->
+        <div class="charts-grid">
+            <section class="chart-section" id="volumeSection">
+                <h3 class="chart-title">成交量 (張)</h3>
+                <div class="chart-container indicator-chart" id="volumeChart"></div>
+            </section>
+            
+            <section class="chart-section" id="kdSection">
+                <h3 class="chart-title">KD 隨機指標</h3>
+                <div class="chart-container indicator-chart" id="kdChart"></div>
+                <div class="chart-legend">
+                    <span class="legend-item"><span class="legend-color" style="background: #4ECDC4"></span>K 值</span>
+                    <span class="legend-item"><span class="legend-color" style="background: #FF6B6B"></span>D 值</span>
+                </div>
+            </section>
+            
+            <section class="chart-section" id="macdSection">
+                <h3 class="chart-title">MACD 指標</h3>
+                <div class="chart-container indicator-chart" id="macdChart"></div>
+                <div class="chart-legend">
+                    <span class="legend-item"><span class="legend-color" style="background: #4ECDC4"></span>DIF</span>
+                    <span class="legend-item"><span class="legend-color" style="background: #FFE66D"></span>MACD</span>
+                    <span class="legend-item"><span class="legend-color" style="background: #888"></span>柱狀圖</span>
+                </div>
+            </section>
+            
+            <section class="chart-section" id="rsiSection">
+                <h3 class="chart-title">RSI 相對強弱指標</h3>
+                <div class="chart-container indicator-chart" id="rsiChart"></div>
+            </section>
+            
+            <section class="chart-section" id="biasSection">
+                <h3 class="chart-title">乖離率 (BIAS)</h3>
+                <div class="chart-container indicator-chart" id="biasChart"></div>
+                <div class="chart-legend">
+                    <span class="legend-item"><span class="legend-color" style="background: #FF6B6B"></span>5日乖離</span>
+                    <span class="legend-item"><span class="legend-color" style="background: #4ECDC4"></span>10日乖離</span>
+                    <span class="legend-item"><span class="legend-color" style="background: #FFE66D"></span>20日乖離</span>
+                </div>
+            </section>
+            
+            <section class="chart-section" id="williamsSection">
+                <h3 class="chart-title">威廉指標 (Williams %R)</h3>
+                <div class="chart-container indicator-chart" id="williamsChart"></div>
+            </section>
+        </div>
+    </main>
+    
+    <footer>
+        <p>資料來源：Yahoo Finance | 僅供參考，投資有風險</p>
+    </footer>
+    
+    <script>
+        // State
+        let currentCode = '';
+        let currentPeriod = '1y';
+        let chartData = null;
+        
+        // Charts
+        let charts = {};
+        let series = {};
+        
+        // MA visibility
+        let maVisible = {
+            ma5: true, ma10: true, ma20: true,
+            ma60: false, ma120: false, ma240: false
+        };
+        
+        // Colors
+        const colors = {
+            ma5: '#FF6B6B',
+            ma10: '#4ECDC4',
+            ma20: '#FFE66D',
+            ma60: '#95E1D3',
+            ma120: '#F38181',
+            ma240: '#AA96DA',
+            k: '#4ECDC4',
+            d: '#FF6B6B',
+            macd: '#4ECDC4',
+            signal: '#FFE66D',
+            rsi: '#58a6ff',
+            bias5: '#FF6B6B',
+            bias10: '#4ECDC4',
+            bias20: '#FFE66D',
+            williams: '#AA96DA',
+            volumeUp: 'rgba(248, 81, 73, 0.8)',
+            volumeDown: 'rgba(63, 185, 80, 0.8)',
+        };
+        
+        // Chart options
+        const chartOptions = {
+            layout: {
+                background: { type: 'solid', color: 'transparent' },
+                textColor: '#8b949e',
+            },
+            grid: {
+                vertLines: { color: 'rgba(48, 54, 61, 0.5)' },
+                horzLines: { color: 'rgba(48, 54, 61, 0.5)' },
+            },
+            crosshair: {
+                mode: LightweightCharts.CrosshairMode.Normal,
+            },
+            rightPriceScale: {
+                borderColor: '#30363d',
+            },
+            timeScale: {
+                borderColor: '#30363d',
+                timeVisible: true,
+            },
+            handleScroll: { vertTouchDrag: false },
+        };
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Enter key to search
+            document.getElementById('stockInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') searchStock();
+            });
+            
+            // Period buttons
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentPeriod = btn.dataset.period;
+                    if (currentCode) loadChartData();
+                });
+            });
+            
+            // MA toggles
+            document.querySelectorAll('.ma-toggle').forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const ma = toggle.dataset.ma;
+                    maVisible[ma] = !maVisible[ma];
+                    toggle.classList.toggle('active');
+                    updateMAVisibility();
+                });
+            });
+        });
+        
+        // Search stock
+        async function searchStock(code = null) {
+            const input = document.getElementById('stockInput');
+            code = code || input.value.trim();
+            
+            if (!code) return;
+            
+            currentCode = code;
+            input.value = code;
+            
+            hideError();
+            showLoading();
+            
+            try {
+                // Fetch quote
+                const quoteRes = await fetch(`/api/quote/${code}`);
+                if (!quoteRes.ok) {
+                    const err = await quoteRes.json();
+                    throw new Error(err.error || '查詢失敗');
+                }
+                const quote = await quoteRes.json();
+                renderQuote(quote);
+                
+                // Fetch chart data
+                await loadChartData();
+                
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+        
+        async function loadChartData() {
+            try {
+                const chartRes = await fetch(`/api/chart/${currentCode}?period=${currentPeriod}`);
+                if (!chartRes.ok) {
+                    const err = await chartRes.json();
+                    throw new Error(err.error || '無法載入圖表');
+                }
+                chartData = await chartRes.json();
+                renderCharts();
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+        
+        function renderQuote(quote) {
+            document.getElementById('stockCard').classList.add('active');
+            document.getElementById('stockCode').textContent = quote.symbol;
+            document.getElementById('stockName').textContent = quote.name;
+            
+            const priceEl = document.getElementById('currentPrice');
+            const changeEl = document.getElementById('priceChange');
+            
+            priceEl.textContent = quote.current_price.toLocaleString();
+            
+            const changeClass = quote.change > 0 ? 'price-up' : (quote.change < 0 ? 'price-down' : 'price-flat');
+            const arrow = quote.change > 0 ? '▲' : (quote.change < 0 ? '▼' : '');
+            changeEl.className = `price-change ${changeClass}`;
+            changeEl.innerHTML = `${arrow} ${Math.abs(quote.change).toFixed(2)} (${quote.change_pct > 0 ? '+' : ''}${quote.change_pct.toFixed(2)}%)`;
+            
+            priceEl.className = `current-price ${changeClass}`;
+            
+            // Stats
+            const stats = [
+                { label: '開盤', value: quote.open?.toLocaleString() },
+                { label: '最高', value: quote.high?.toLocaleString() },
+                { label: '最低', value: quote.low?.toLocaleString() },
+                { label: '昨收', value: quote.prev_close?.toLocaleString() },
+                { label: '成交量', value: quote.volume?.toLocaleString() + ' 張' },
+                { label: '52週高', value: quote.week52_high?.toLocaleString() || '-' },
+                { label: '52週低', value: quote.week52_low?.toLocaleString() || '-' },
+                { label: '本益比', value: quote.pe_ratio?.toFixed(2) || '-' },
+            ];
+            
+            document.getElementById('statsGrid').innerHTML = stats.map(s => `
+                <div class="stat-item">
+                    <div class="stat-label">${s.label}</div>
+                    <div class="stat-value">${s.value || '-'}</div>
+                </div>
+            `).join('');
+        }
+        
+        function renderCharts() {
+            if (!chartData) return;
+            
+            // Show chart sections
+            document.querySelectorAll('.chart-section').forEach(s => s.classList.add('active'));
+            
+            // Clear old charts
+            Object.values(charts).forEach(chart => chart.remove());
+            charts = {};
+            series = {};
+            
+            const dates = chartData.dates;
+            
+            // Main candlestick chart
+            const mainContainer = document.getElementById('mainChart');
+            mainContainer.innerHTML = '';
+            charts.main = LightweightCharts.createChart(mainContainer, {
+                ...chartOptions,
+                height: 400,
+            });
+            
+            // Candlestick series
+            series.candle = charts.main.addCandlestickSeries({
+                upColor: '#f85149',
+                downColor: '#3fb950',
+                borderUpColor: '#f85149',
+                borderDownColor: '#3fb950',
+                wickUpColor: '#f85149',
+                wickDownColor: '#3fb950',
+            });
+            
+            const candleData = dates.map((date, i) => ({
+                time: date,
+                open: chartData.ohlc.open[i],
+                high: chartData.ohlc.high[i],
+                low: chartData.ohlc.low[i],
+                close: chartData.ohlc.close[i],
+            }));
+            series.candle.setData(candleData);
+            
+            // MA lines
+            Object.keys(chartData.ma).forEach(ma => {
+                series[ma] = charts.main.addLineSeries({
+                    color: colors[ma],
+                    lineWidth: 1,
+                    visible: maVisible[ma],
+                });
+                const maData = dates.map((date, i) => ({
+                    time: date,
+                    value: chartData.ma[ma][i],
+                })).filter(d => d.value !== null);
+                series[ma].setData(maData);
+            });
+            
+            // Bollinger Bands
+            series.bbUpper = charts.main.addLineSeries({
+                color: 'rgba(170, 150, 218, 0.5)',
+                lineWidth: 1,
+                lineStyle: 2,
+            });
+            series.bbLower = charts.main.addLineSeries({
+                color: 'rgba(170, 150, 218, 0.5)',
+                lineWidth: 1,
+                lineStyle: 2,
+            });
+            
+            series.bbUpper.setData(dates.map((date, i) => ({
+                time: date,
+                value: chartData.bollinger.upper[i],
+            })).filter(d => d.value !== null));
+            
+            series.bbLower.setData(dates.map((date, i) => ({
+                time: date,
+                value: chartData.bollinger.lower[i],
+            })).filter(d => d.value !== null));
+            
+            charts.main.timeScale().fitContent();
+            
+            // Volume chart
+            renderVolumeChart(dates);
+            
+            // KD chart
+            renderKDChart(dates);
+            
+            // MACD chart
+            renderMACDChart(dates);
+            
+            // RSI chart
+            renderRSIChart(dates);
+            
+            // BIAS chart
+            renderBiasChart(dates);
+            
+            // Williams chart
+            renderWilliamsChart(dates);
+            
+            // Sync time scales
+            syncTimeScales();
+        }
+        
+        function renderVolumeChart(dates) {
+            const container = document.getElementById('volumeChart');
+            container.innerHTML = '';
+            charts.volume = LightweightCharts.createChart(container, { ...chartOptions, height: 200 });
+            
+            series.volume = charts.volume.addHistogramSeries({
+                priceFormat: { type: 'volume' },
+            });
+            
+            const volData = dates.map((date, i) => ({
+                time: date,
+                value: chartData.volume[i],
+                color: chartData.ohlc.close[i] >= chartData.ohlc.open[i] ? colors.volumeUp : colors.volumeDown,
+            }));
+            series.volume.setData(volData);
+            charts.volume.timeScale().fitContent();
+        }
+        
+        function renderKDChart(dates) {
+            const container = document.getElementById('kdChart');
+            container.innerHTML = '';
+            charts.kd = LightweightCharts.createChart(container, { ...chartOptions, height: 200 });
+            
+            // Overbought/oversold lines
+            const ob = charts.kd.addLineSeries({ color: 'rgba(248, 81, 73, 0.3)', lineWidth: 1, lineStyle: 2 });
+            const os = charts.kd.addLineSeries({ color: 'rgba(63, 185, 80, 0.3)', lineWidth: 1, lineStyle: 2 });
+            ob.setData(dates.map(d => ({ time: d, value: 80 })));
+            os.setData(dates.map(d => ({ time: d, value: 20 })));
+            
+            series.k = charts.kd.addLineSeries({ color: colors.k, lineWidth: 2 });
+            series.d = charts.kd.addLineSeries({ color: colors.d, lineWidth: 2 });
+            
+            series.k.setData(dates.map((date, i) => ({
+                time: date, value: chartData.kd.k[i]
+            })).filter(d => d.value !== null));
+            
+            series.d.setData(dates.map((date, i) => ({
+                time: date, value: chartData.kd.d[i]
+            })).filter(d => d.value !== null));
+            
+            charts.kd.timeScale().fitContent();
+        }
+        
+        function renderMACDChart(dates) {
+            const container = document.getElementById('macdChart');
+            container.innerHTML = '';
+            charts.macd = LightweightCharts.createChart(container, { ...chartOptions, height: 200 });
+            
+            series.macdHist = charts.macd.addHistogramSeries({
+                priceFormat: { type: 'price', precision: 2 },
+            });
+            
+            const histData = dates.map((date, i) => ({
+                time: date,
+                value: chartData.macd.histogram[i],
+                color: chartData.macd.histogram[i] >= 0 ? 'rgba(248, 81, 73, 0.6)' : 'rgba(63, 185, 80, 0.6)',
+            })).filter(d => d.value !== null);
+            series.macdHist.setData(histData);
+            
+            series.macdLine = charts.macd.addLineSeries({ color: colors.macd, lineWidth: 2 });
+            series.signalLine = charts.macd.addLineSeries({ color: colors.signal, lineWidth: 2 });
+            
+            series.macdLine.setData(dates.map((date, i) => ({
+                time: date, value: chartData.macd.macd[i]
+            })).filter(d => d.value !== null));
+            
+            series.signalLine.setData(dates.map((date, i) => ({
+                time: date, value: chartData.macd.signal[i]
+            })).filter(d => d.value !== null));
+            
+            charts.macd.timeScale().fitContent();
+        }
+        
+        function renderRSIChart(dates) {
+            const container = document.getElementById('rsiChart');
+            container.innerHTML = '';
+            charts.rsi = LightweightCharts.createChart(container, { ...chartOptions, height: 200 });
+            
+            // Overbought/oversold
+            const ob = charts.rsi.addLineSeries({ color: 'rgba(248, 81, 73, 0.3)', lineWidth: 1, lineStyle: 2 });
+            const os = charts.rsi.addLineSeries({ color: 'rgba(63, 185, 80, 0.3)', lineWidth: 1, lineStyle: 2 });
+            ob.setData(dates.map(d => ({ time: d, value: 70 })));
+            os.setData(dates.map(d => ({ time: d, value: 30 })));
+            
+            series.rsi = charts.rsi.addLineSeries({ color: colors.rsi, lineWidth: 2 });
+            series.rsi.setData(dates.map((date, i) => ({
+                time: date, value: chartData.rsi[i]
+            })).filter(d => d.value !== null));
+            
+            charts.rsi.timeScale().fitContent();
+        }
+        
+        function renderBiasChart(dates) {
+            const container = document.getElementById('biasChart');
+            container.innerHTML = '';
+            charts.bias = LightweightCharts.createChart(container, { ...chartOptions, height: 200 });
+            
+            // Zero line
+            const zero = charts.bias.addLineSeries({ color: 'rgba(255,255,255,0.2)', lineWidth: 1, lineStyle: 2 });
+            zero.setData(dates.map(d => ({ time: d, value: 0 })));
+            
+            series.bias5 = charts.bias.addLineSeries({ color: colors.bias5, lineWidth: 2 });
+            series.bias10 = charts.bias.addLineSeries({ color: colors.bias10, lineWidth: 2 });
+            series.bias20 = charts.bias.addLineSeries({ color: colors.bias20, lineWidth: 2 });
+            
+            series.bias5.setData(dates.map((date, i) => ({
+                time: date, value: chartData.bias.bias5[i]
+            })).filter(d => d.value !== null));
+            
+            series.bias10.setData(dates.map((date, i) => ({
+                time: date, value: chartData.bias.bias10[i]
+            })).filter(d => d.value !== null));
+            
+            series.bias20.setData(dates.map((date, i) => ({
+                time: date, value: chartData.bias.bias20[i]
+            })).filter(d => d.value !== null));
+            
+            charts.bias.timeScale().fitContent();
+        }
+        
+        function renderWilliamsChart(dates) {
+            const container = document.getElementById('williamsChart');
+            container.innerHTML = '';
+            charts.williams = LightweightCharts.createChart(container, { ...chartOptions, height: 200 });
+            
+            // Overbought/oversold
+            const ob = charts.williams.addLineSeries({ color: 'rgba(248, 81, 73, 0.3)', lineWidth: 1, lineStyle: 2 });
+            const os = charts.williams.addLineSeries({ color: 'rgba(63, 185, 80, 0.3)', lineWidth: 1, lineStyle: 2 });
+            ob.setData(dates.map(d => ({ time: d, value: -20 })));
+            os.setData(dates.map(d => ({ time: d, value: -80 })));
+            
+            series.williams = charts.williams.addLineSeries({ color: colors.williams, lineWidth: 2 });
+            series.williams.setData(dates.map((date, i) => ({
+                time: date, value: chartData.williams[i]
+            })).filter(d => d.value !== null));
+            
+            charts.williams.timeScale().fitContent();
+        }
+        
+        function syncTimeScales() {
+            const allCharts = Object.values(charts);
+            if (allCharts.length < 2) return;
+            
+            allCharts.forEach((chart, index) => {
+                chart.timeScale().subscribeVisibleLogicalRangeChange(range => {
+                    allCharts.forEach((otherChart, otherIndex) => {
+                        if (index !== otherIndex) {
+                            otherChart.timeScale().setVisibleLogicalRange(range);
+                        }
+                    });
+                });
+            });
+        }
+        
+        function updateMAVisibility() {
+            Object.keys(maVisible).forEach(ma => {
+                if (series[ma]) {
+                    series[ma].applyOptions({ visible: maVisible[ma] });
+                }
+            });
+        }
+        
+        function showLoading() {
+            document.getElementById('stockCard').classList.remove('active');
+            document.querySelectorAll('.chart-section').forEach(s => s.classList.remove('active'));
+        }
+        
+        function showError(msg) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = msg;
+            el.classList.add('show');
+            document.getElementById('stockCard').classList.remove('active');
+            document.querySelectorAll('.chart-section').forEach(s => s.classList.remove('active'));
+        }
+        
+        function hideError() {
+            document.getElementById('errorMessage').classList.remove('show');
+        }
+    </script>
+</body>
+</html>
