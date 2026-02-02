@@ -32,6 +32,7 @@
             --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-4: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
             --glass-bg: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.1);
             --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
@@ -134,6 +135,7 @@
         .search-container {
             flex: 1;
             max-width: 500px;
+            position: relative;
         }
         
         .search-box {
@@ -181,12 +183,319 @@
             box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
         }
         
+        /* Search Results Dropdown */
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-top: 0.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .search-results.show {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+        
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .search-result-item:hover {
+            background: var(--bg-tertiary);
+        }
+        
+        .search-result-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .search-result-code {
+            font-weight: 600;
+            color: var(--accent-primary);
+        }
+        
+        .search-result-name {
+            color: var(--text-secondary);
+        }
+        
+        .search-result-add {
+            background: var(--gradient-4);
+            border: none;
+            color: white;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+        
+        .search-result-item:hover .search-result-add {
+            opacity: 1;
+        }
+        
+        .search-result-add:hover {
+            transform: scale(1.05);
+        }
+        
+        .search-result-add.added {
+            background: var(--success);
+            opacity: 1;
+        }
+        
+        /* Header buttons */
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .watchlist-btn {
+            background: var(--gradient-4);
+            border: none;
+            color: white;
+            padding: 0.625rem 1.25rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .watchlist-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(250, 112, 154, 0.4);
+        }
+        
+        .watchlist-count {
+            background: rgba(255,255,255,0.2);
+            padding: 0.125rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+        
         /* Main content */
         main {
             max-width: 1600px;
             margin: 0 auto;
             padding: 2rem;
         }
+        
+        /* Watchlist Section */
+        .watchlist-section {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            display: none;
+        }
+        
+        .watchlist-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .watchlist-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .watchlist-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .watchlist-title::before {
+            content: '⭐';
+        }
+        
+        .watchlist-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .watchlist-action-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .watchlist-action-btn:hover {
+            background: var(--accent-secondary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+        
+        .watchlist-action-btn.danger:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+        
+        /* Add stock form */
+        .add-stock-form {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+        }
+        
+        .add-stock-input {
+            flex: 1;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.625rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            outline: none;
+        }
+        
+        .add-stock-input:focus {
+            border-color: var(--accent-primary);
+        }
+        
+        .add-stock-btn {
+            background: var(--gradient-3);
+            border: none;
+            color: white;
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        /* Watchlist grid */
+        .watchlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        
+        .watchlist-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+        
+        .watchlist-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .watchlist-item:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(88, 166, 255, 0.15);
+        }
+        
+        .watchlist-item.dragging {
+            opacity: 0.5;
+            border: 2px dashed var(--accent-primary);
+        }
+        
+        .watchlist-item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .watchlist-item-code {
+            font-weight: 700;
+            font-size: 1.125rem;
+            color: var(--accent-primary);
+        }
+        
+        .watchlist-item-actions {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .watchlist-item-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.25rem;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .watchlist-item-btn:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+        
+        .watchlist-item-btn.delete:hover {
+            color: var(--danger);
+        }
+        
+        .watchlist-item-name {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .watchlist-item-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .watchlist-item-change {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+        
+        .watchlist-item-change.up { color: var(--danger); }
+        .watchlist-item-change.down { color: var(--success); }
         
         /* Stock info card */
         .stock-card {
@@ -238,6 +547,26 @@
             font-weight: 700;
         }
         
+        .add-to-watchlist-btn {
+            background: var(--gradient-4);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .add-to-watchlist-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .add-to-watchlist-btn.added {
+            background: var(--success);
+        }
+        
         .stock-price-section {
             text-align: right;
         }
@@ -258,8 +587,8 @@
             font-weight: 600;
         }
         
-        .price-up { color: var(--danger); }  /* 台股紅漲 */
-        .price-down { color: var(--success); }  /* 台股綠跌 */
+        .price-up { color: var(--danger); }
+        .price-down { color: var(--success); }
         .price-flat { color: var(--text-secondary); }
         
         /* Stats grid */
@@ -539,6 +868,36 @@
             color: var(--accent-primary);
             text-decoration: none;
         }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .toast.success {
+            border-color: var(--success);
+        }
+        
+        .toast.error {
+            border-color: var(--danger);
+        }
     </style>
 </head>
 <body>
@@ -553,15 +912,46 @@
             
             <div class="search-container">
                 <div class="search-box">
-                    <input type="text" id="stockInput" placeholder="輸入股票代號 (如 2330、0050)" 
-                           autocomplete="off" maxlength="10">
+                    <input type="text" id="stockInput" placeholder="輸入股票代號或名稱 (如 2330、台積電)" 
+                           autocomplete="off" maxlength="20">
                     <button class="search-btn" onclick="searchStock()">查詢</button>
                 </div>
+                <div class="search-results" id="searchResults"></div>
+            </div>
+            
+            <div class="header-actions">
+                <button class="watchlist-btn" onclick="toggleWatchlist()">
+                    ⭐ 自選股
+                    <span class="watchlist-count" id="watchlistCount">0</span>
+                </button>
             </div>
         </div>
     </header>
     
     <main>
+        <!-- Watchlist Section -->
+        <section class="watchlist-section" id="watchlistSection">
+            <div class="watchlist-header">
+                <h2 class="watchlist-title">我的自選股</h2>
+                <div class="watchlist-actions">
+                    <button class="watchlist-action-btn" onclick="refreshWatchlistPrices()">🔄 更新報價</button>
+                    <button class="watchlist-action-btn danger" onclick="clearWatchlist()">🗑️ 清空</button>
+                </div>
+            </div>
+            
+            <div class="add-stock-form">
+                <input type="text" class="add-stock-input" id="addStockInput" 
+                       placeholder="輸入股票代號或名稱快速新增..." maxlength="20">
+                <button class="add-stock-btn" onclick="addStockFromInput()">+ 加入</button>
+            </div>
+            
+            <div class="watchlist-grid" id="watchlistGrid">
+                <div class="watchlist-empty">
+                    還沒有自選股，用上方搜尋或輸入代號新增吧！
+                </div>
+            </div>
+        </section>
+        
         <!-- Popular stocks -->
         <section class="popular-section">
             <h2 class="section-title">🔥 熱門股票</h2>
@@ -584,6 +974,9 @@
                 <div class="stock-title">
                     <span class="stock-code" id="stockCode"></span>
                     <h2 class="stock-name" id="stockName"></h2>
+                    <button class="add-to-watchlist-btn" id="addToWatchlistBtn" onclick="toggleCurrentStock()">
+                        + 加入自選
+                    </button>
                 </div>
                 <div class="stock-price-section">
                     <div class="current-price" id="currentPrice"></div>
@@ -591,9 +984,7 @@
                 </div>
             </div>
             
-            <div class="stats-grid" id="statsGrid">
-                <!-- Stats will be populated by JS -->
-            </div>
+            <div class="stats-grid" id="statsGrid"></div>
         </section>
         
         <!-- Chart controls -->
@@ -693,11 +1084,17 @@
         <p>資料來源：Yahoo Finance | 僅供參考，投資有風險</p>
     </footer>
     
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+    
     <script>
-        // State
+        // ===== State =====
         let currentCode = '';
+        let currentName = '';
         let currentPeriod = '1y';
         let chartData = null;
+        let watchlist = [];
+        let searchTimeout = null;
         
         // Charts
         let charts = {};
@@ -711,20 +1108,12 @@
         
         // Colors
         const colors = {
-            ma5: '#FF6B6B',
-            ma10: '#4ECDC4',
-            ma20: '#FFE66D',
-            ma60: '#95E1D3',
-            ma120: '#F38181',
-            ma240: '#AA96DA',
-            k: '#4ECDC4',
-            d: '#FF6B6B',
-            macd: '#4ECDC4',
-            signal: '#FFE66D',
+            ma5: '#FF6B6B', ma10: '#4ECDC4', ma20: '#FFE66D',
+            ma60: '#95E1D3', ma120: '#F38181', ma240: '#AA96DA',
+            k: '#4ECDC4', d: '#FF6B6B',
+            macd: '#4ECDC4', signal: '#FFE66D',
             rsi: '#58a6ff',
-            bias5: '#FF6B6B',
-            bias10: '#4ECDC4',
-            bias20: '#FFE66D',
+            bias5: '#FF6B6B', bias10: '#4ECDC4', bias20: '#FFE66D',
             williams: '#AA96DA',
             volumeUp: 'rgba(248, 81, 73, 0.8)',
             volumeDown: 'rgba(63, 185, 80, 0.8)',
@@ -740,24 +1129,301 @@
                 vertLines: { color: 'rgba(48, 54, 61, 0.5)' },
                 horzLines: { color: 'rgba(48, 54, 61, 0.5)' },
             },
-            crosshair: {
-                mode: LightweightCharts.CrosshairMode.Normal,
-            },
-            rightPriceScale: {
-                borderColor: '#30363d',
-            },
-            timeScale: {
-                borderColor: '#30363d',
-                timeVisible: true,
-            },
+            crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+            rightPriceScale: { borderColor: '#30363d' },
+            timeScale: { borderColor: '#30363d', timeVisible: true },
             handleScroll: { vertTouchDrag: false },
         };
         
-        // Initialize
+        // ===== LocalStorage =====
+        const WATCHLIST_KEY = 'twstock_watchlist';
+        
+        function loadWatchlist() {
+            try {
+                const data = localStorage.getItem(WATCHLIST_KEY);
+                watchlist = data ? JSON.parse(data) : [];
+            } catch (e) {
+                watchlist = [];
+            }
+            updateWatchlistUI();
+        }
+        
+        function saveWatchlist() {
+            localStorage.setItem(WATCHLIST_KEY, JSON.stringify(watchlist));
+            updateWatchlistUI();
+        }
+        
+        function isInWatchlist(code) {
+            return watchlist.some(item => item.code === code);
+        }
+        
+        function addToWatchlist(code, name) {
+            if (isInWatchlist(code)) {
+                showToast('已在自選股中', 'error');
+                return;
+            }
+            watchlist.push({ code, name, price: null, change: null });
+            saveWatchlist();
+            showToast(`已加入 ${name} (${code})`, 'success');
+            fetchWatchlistPrice(code);
+        }
+        
+        function removeFromWatchlist(code) {
+            const index = watchlist.findIndex(item => item.code === code);
+            if (index > -1) {
+                const item = watchlist[index];
+                watchlist.splice(index, 1);
+                saveWatchlist();
+                showToast(`已移除 ${item.name} (${code})`, 'success');
+            }
+        }
+        
+        function moveWatchlistItem(fromIndex, toIndex) {
+            const item = watchlist.splice(fromIndex, 1)[0];
+            watchlist.splice(toIndex, 0, item);
+            saveWatchlist();
+        }
+        
+        function clearWatchlist() {
+            if (confirm('確定要清空所有自選股嗎？')) {
+                watchlist = [];
+                saveWatchlist();
+                showToast('已清空自選股', 'success');
+            }
+        }
+        
+        // ===== Watchlist UI =====
+        function updateWatchlistUI() {
+            document.getElementById('watchlistCount').textContent = watchlist.length;
+            
+            const grid = document.getElementById('watchlistGrid');
+            
+            if (watchlist.length === 0) {
+                grid.innerHTML = '<div class="watchlist-empty">還沒有自選股，用上方搜尋或輸入代號新增吧！</div>';
+                return;
+            }
+            
+            grid.innerHTML = watchlist.map((item, index) => `
+                <div class="watchlist-item" draggable="true" data-index="${index}" data-code="${item.code}"
+                     onclick="searchStock('${item.code}')">
+                    <div class="watchlist-item-header">
+                        <span class="watchlist-item-code">${item.code}</span>
+                        <div class="watchlist-item-actions">
+                            <button class="watchlist-item-btn" onclick="event.stopPropagation(); moveUp(${index})" title="上移">⬆️</button>
+                            <button class="watchlist-item-btn" onclick="event.stopPropagation(); moveDown(${index})" title="下移">⬇️</button>
+                            <button class="watchlist-item-btn delete" onclick="event.stopPropagation(); removeFromWatchlist('${item.code}')" title="刪除">✕</button>
+                        </div>
+                    </div>
+                    <div class="watchlist-item-name">${item.name}</div>
+                    <div class="watchlist-item-price">${item.price ? item.price.toLocaleString() : '---'}</div>
+                    <div class="watchlist-item-change ${item.change > 0 ? 'up' : item.change < 0 ? 'down' : ''}">
+                        ${item.change !== null ? (item.change > 0 ? '▲' : item.change < 0 ? '▼' : '') + ' ' + Math.abs(item.change).toFixed(2) + '%' : '---'}
+                    </div>
+                </div>
+            `).join('');
+            
+            // Update add button state
+            updateAddToWatchlistBtn();
+            
+            // Setup drag and drop
+            setupDragAndDrop();
+        }
+        
+        function moveUp(index) {
+            if (index > 0) {
+                moveWatchlistItem(index, index - 1);
+            }
+        }
+        
+        function moveDown(index) {
+            if (index < watchlist.length - 1) {
+                moveWatchlistItem(index, index + 1);
+            }
+        }
+        
+        function setupDragAndDrop() {
+            const items = document.querySelectorAll('.watchlist-item[draggable]');
+            
+            items.forEach(item => {
+                item.addEventListener('dragstart', (e) => {
+                    item.classList.add('dragging');
+                    e.dataTransfer.setData('text/plain', item.dataset.index);
+                });
+                
+                item.addEventListener('dragend', () => {
+                    item.classList.remove('dragging');
+                });
+                
+                item.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                });
+                
+                item.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                    const toIndex = parseInt(item.dataset.index);
+                    if (fromIndex !== toIndex) {
+                        moveWatchlistItem(fromIndex, toIndex);
+                    }
+                });
+            });
+        }
+        
+        function toggleWatchlist() {
+            const section = document.getElementById('watchlistSection');
+            section.classList.toggle('active');
+        }
+        
+        function toggleCurrentStock() {
+            if (!currentCode) return;
+            
+            if (isInWatchlist(currentCode)) {
+                removeFromWatchlist(currentCode);
+            } else {
+                addToWatchlist(currentCode, currentName);
+            }
+            updateAddToWatchlistBtn();
+        }
+        
+        function updateAddToWatchlistBtn() {
+            const btn = document.getElementById('addToWatchlistBtn');
+            if (!currentCode) return;
+            
+            if (isInWatchlist(currentCode)) {
+                btn.textContent = '✓ 已加入';
+                btn.classList.add('added');
+            } else {
+                btn.textContent = '+ 加入自選';
+                btn.classList.remove('added');
+            }
+        }
+        
+        async function fetchWatchlistPrice(code) {
+            try {
+                const res = await fetch(`/api/quote/${code}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    const item = watchlist.find(i => i.code === code);
+                    if (item) {
+                        item.price = data.current_price;
+                        item.change = data.change_pct;
+                        saveWatchlist();
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to fetch price for', code);
+            }
+        }
+        
+        async function refreshWatchlistPrices() {
+            showToast('更新報價中...', 'success');
+            for (const item of watchlist) {
+                await fetchWatchlistPrice(item.code);
+            }
+            showToast('報價已更新', 'success');
+        }
+        
+        async function addStockFromInput() {
+            const input = document.getElementById('addStockInput');
+            const query = input.value.trim();
+            if (!query) return;
+            
+            // Try direct code first
+            try {
+                const res = await fetch(`/api/stock/${query}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    addToWatchlist(data.code, data.name);
+                    input.value = '';
+                    return;
+                }
+            } catch (e) {}
+            
+            // Try search
+            try {
+                const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                if (res.ok) {
+                    const results = await res.json();
+                    if (results.length > 0) {
+                        addToWatchlist(results[0].code, results[0].name);
+                        input.value = '';
+                        return;
+                    }
+                }
+            } catch (e) {}
+            
+            showToast('找不到此股票', 'error');
+        }
+        
+        // ===== Search =====
+        async function liveSearch(query) {
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (!query || query.length < 1) {
+                resultsDiv.classList.remove('show');
+                return;
+            }
+            
+            try {
+                const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                if (!res.ok) return;
+                
+                const results = await res.json();
+                
+                if (results.length === 0) {
+                    resultsDiv.classList.remove('show');
+                    return;
+                }
+                
+                resultsDiv.innerHTML = results.map(item => `
+                    <div class="search-result-item" onclick="searchStock('${item.code}')">
+                        <div class="search-result-info">
+                            <span class="search-result-code">${item.code}</span>
+                            <span class="search-result-name">${item.name}</span>
+                        </div>
+                        <button class="search-result-add ${isInWatchlist(item.code) ? 'added' : ''}" 
+                                onclick="event.stopPropagation(); addToWatchlist('${item.code}', '${item.name}')">
+                            ${isInWatchlist(item.code) ? '✓ 已加入' : '+ 自選'}
+                        </button>
+                    </div>
+                `).join('');
+                
+                resultsDiv.classList.add('show');
+            } catch (e) {
+                console.error('Search error:', e);
+            }
+        }
+        
+        // ===== Initialize =====
         document.addEventListener('DOMContentLoaded', () => {
-            // Enter key to search
-            document.getElementById('stockInput').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') searchStock();
+            loadWatchlist();
+            
+            const stockInput = document.getElementById('stockInput');
+            
+            // Live search
+            stockInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => liveSearch(e.target.value.trim()), 300);
+            });
+            
+            // Enter key
+            stockInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    document.getElementById('searchResults').classList.remove('show');
+                    searchStock();
+                }
+            });
+            
+            // Close search results on click outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.search-container')) {
+                    document.getElementById('searchResults').classList.remove('show');
+                }
+            });
+            
+            // Add stock input enter
+            document.getElementById('addStockInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addStockFromInput();
             });
             
             // Period buttons
@@ -781,7 +1447,7 @@
             });
         });
         
-        // Search stock
+        // ===== Search Stock =====
         async function searchStock(code = null) {
             const input = document.getElementById('stockInput');
             code = code || input.value.trim();
@@ -790,21 +1456,21 @@
             
             currentCode = code;
             input.value = code;
+            document.getElementById('searchResults').classList.remove('show');
             
             hideError();
             showLoading();
             
             try {
-                // Fetch quote
                 const quoteRes = await fetch(`/api/quote/${code}`);
                 if (!quoteRes.ok) {
                     const err = await quoteRes.json();
                     throw new Error(err.error || '查詢失敗');
                 }
                 const quote = await quoteRes.json();
+                currentName = quote.name;
                 renderQuote(quote);
                 
-                // Fetch chart data
                 await loadChartData();
                 
             } catch (error) {
@@ -843,7 +1509,8 @@
             
             priceEl.className = `current-price ${changeClass}`;
             
-            // Stats
+            updateAddToWatchlistBtn();
+            
             const stats = [
                 { label: '開盤', value: quote.open?.toLocaleString() },
                 { label: '最高', value: quote.high?.toLocaleString() },
@@ -866,32 +1533,23 @@
         function renderCharts() {
             if (!chartData) return;
             
-            // Show chart sections
             document.querySelectorAll('.chart-section').forEach(s => s.classList.add('active'));
             
-            // Clear old charts
             Object.values(charts).forEach(chart => chart.remove());
             charts = {};
             series = {};
             
             const dates = chartData.dates;
             
-            // Main candlestick chart
+            // Main chart
             const mainContainer = document.getElementById('mainChart');
             mainContainer.innerHTML = '';
-            charts.main = LightweightCharts.createChart(mainContainer, {
-                ...chartOptions,
-                height: 400,
-            });
+            charts.main = LightweightCharts.createChart(mainContainer, { ...chartOptions, height: 400 });
             
-            // Candlestick series
             series.candle = charts.main.addCandlestickSeries({
-                upColor: '#f85149',
-                downColor: '#3fb950',
-                borderUpColor: '#f85149',
-                borderDownColor: '#3fb950',
-                wickUpColor: '#f85149',
-                wickDownColor: '#3fb950',
+                upColor: '#f85149', downColor: '#3fb950',
+                borderUpColor: '#f85149', borderDownColor: '#3fb950',
+                wickUpColor: '#f85149', wickDownColor: '#3fb950',
             });
             
             const candleData = dates.map((date, i) => ({
@@ -917,49 +1575,22 @@
                 series[ma].setData(maData);
             });
             
-            // Bollinger Bands
-            series.bbUpper = charts.main.addLineSeries({
-                color: 'rgba(170, 150, 218, 0.5)',
-                lineWidth: 1,
-                lineStyle: 2,
-            });
-            series.bbLower = charts.main.addLineSeries({
-                color: 'rgba(170, 150, 218, 0.5)',
-                lineWidth: 1,
-                lineStyle: 2,
-            });
+            // Bollinger
+            series.bbUpper = charts.main.addLineSeries({ color: 'rgba(170, 150, 218, 0.5)', lineWidth: 1, lineStyle: 2 });
+            series.bbLower = charts.main.addLineSeries({ color: 'rgba(170, 150, 218, 0.5)', lineWidth: 1, lineStyle: 2 });
             
-            series.bbUpper.setData(dates.map((date, i) => ({
-                time: date,
-                value: chartData.bollinger.upper[i],
-            })).filter(d => d.value !== null));
-            
-            series.bbLower.setData(dates.map((date, i) => ({
-                time: date,
-                value: chartData.bollinger.lower[i],
-            })).filter(d => d.value !== null));
+            series.bbUpper.setData(dates.map((date, i) => ({ time: date, value: chartData.bollinger.upper[i] })).filter(d => d.value !== null));
+            series.bbLower.setData(dates.map((date, i) => ({ time: date, value: chartData.bollinger.lower[i] })).filter(d => d.value !== null));
             
             charts.main.timeScale().fitContent();
             
-            // Volume chart
             renderVolumeChart(dates);
-            
-            // KD chart
             renderKDChart(dates);
-            
-            // MACD chart
             renderMACDChart(dates);
-            
-            // RSI chart
             renderRSIChart(dates);
-            
-            // BIAS chart
             renderBiasChart(dates);
-            
-            // Williams chart
             renderWilliamsChart(dates);
             
-            // Sync time scales
             syncTimeScales();
         }
         
@@ -968,9 +1599,7 @@
             container.innerHTML = '';
             charts.volume = LightweightCharts.createChart(container, { ...chartOptions, height: 200 });
             
-            series.volume = charts.volume.addHistogramSeries({
-                priceFormat: { type: 'volume' },
-            });
+            series.volume = charts.volume.addHistogramSeries({ priceFormat: { type: 'volume' } });
             
             const volData = dates.map((date, i) => ({
                 time: date,
@@ -986,7 +1615,6 @@
             container.innerHTML = '';
             charts.kd = LightweightCharts.createChart(container, { ...chartOptions, height: 200 });
             
-            // Overbought/oversold lines
             const ob = charts.kd.addLineSeries({ color: 'rgba(248, 81, 73, 0.3)', lineWidth: 1, lineStyle: 2 });
             const os = charts.kd.addLineSeries({ color: 'rgba(63, 185, 80, 0.3)', lineWidth: 1, lineStyle: 2 });
             ob.setData(dates.map(d => ({ time: d, value: 80 })));
@@ -995,13 +1623,8 @@
             series.k = charts.kd.addLineSeries({ color: colors.k, lineWidth: 2 });
             series.d = charts.kd.addLineSeries({ color: colors.d, lineWidth: 2 });
             
-            series.k.setData(dates.map((date, i) => ({
-                time: date, value: chartData.kd.k[i]
-            })).filter(d => d.value !== null));
-            
-            series.d.setData(dates.map((date, i) => ({
-                time: date, value: chartData.kd.d[i]
-            })).filter(d => d.value !== null));
+            series.k.setData(dates.map((date, i) => ({ time: date, value: chartData.kd.k[i] })).filter(d => d.value !== null));
+            series.d.setData(dates.map((date, i) => ({ time: date, value: chartData.kd.d[i] })).filter(d => d.value !== null));
             
             charts.kd.timeScale().fitContent();
         }
@@ -1011,9 +1634,7 @@
             container.innerHTML = '';
             charts.macd = LightweightCharts.createChart(container, { ...chartOptions, height: 200 });
             
-            series.macdHist = charts.macd.addHistogramSeries({
-                priceFormat: { type: 'price', precision: 2 },
-            });
+            series.macdHist = charts.macd.addHistogramSeries({ priceFormat: { type: 'price', precision: 2 } });
             
             const histData = dates.map((date, i) => ({
                 time: date,
@@ -1025,13 +1646,8 @@
             series.macdLine = charts.macd.addLineSeries({ color: colors.macd, lineWidth: 2 });
             series.signalLine = charts.macd.addLineSeries({ color: colors.signal, lineWidth: 2 });
             
-            series.macdLine.setData(dates.map((date, i) => ({
-                time: date, value: chartData.macd.macd[i]
-            })).filter(d => d.value !== null));
-            
-            series.signalLine.setData(dates.map((date, i) => ({
-                time: date, value: chartData.macd.signal[i]
-            })).filter(d => d.value !== null));
+            series.macdLine.setData(dates.map((date, i) => ({ time: date, value: chartData.macd.macd[i] })).filter(d => d.value !== null));
+            series.signalLine.setData(dates.map((date, i) => ({ time: date, value: chartData.macd.signal[i] })).filter(d => d.value !== null));
             
             charts.macd.timeScale().fitContent();
         }
@@ -1041,16 +1657,13 @@
             container.innerHTML = '';
             charts.rsi = LightweightCharts.createChart(container, { ...chartOptions, height: 200 });
             
-            // Overbought/oversold
             const ob = charts.rsi.addLineSeries({ color: 'rgba(248, 81, 73, 0.3)', lineWidth: 1, lineStyle: 2 });
             const os = charts.rsi.addLineSeries({ color: 'rgba(63, 185, 80, 0.3)', lineWidth: 1, lineStyle: 2 });
             ob.setData(dates.map(d => ({ time: d, value: 70 })));
             os.setData(dates.map(d => ({ time: d, value: 30 })));
             
             series.rsi = charts.rsi.addLineSeries({ color: colors.rsi, lineWidth: 2 });
-            series.rsi.setData(dates.map((date, i) => ({
-                time: date, value: chartData.rsi[i]
-            })).filter(d => d.value !== null));
+            series.rsi.setData(dates.map((date, i) => ({ time: date, value: chartData.rsi[i] })).filter(d => d.value !== null));
             
             charts.rsi.timeScale().fitContent();
         }
@@ -1060,7 +1673,6 @@
             container.innerHTML = '';
             charts.bias = LightweightCharts.createChart(container, { ...chartOptions, height: 200 });
             
-            // Zero line
             const zero = charts.bias.addLineSeries({ color: 'rgba(255,255,255,0.2)', lineWidth: 1, lineStyle: 2 });
             zero.setData(dates.map(d => ({ time: d, value: 0 })));
             
@@ -1068,17 +1680,9 @@
             series.bias10 = charts.bias.addLineSeries({ color: colors.bias10, lineWidth: 2 });
             series.bias20 = charts.bias.addLineSeries({ color: colors.bias20, lineWidth: 2 });
             
-            series.bias5.setData(dates.map((date, i) => ({
-                time: date, value: chartData.bias.bias5[i]
-            })).filter(d => d.value !== null));
-            
-            series.bias10.setData(dates.map((date, i) => ({
-                time: date, value: chartData.bias.bias10[i]
-            })).filter(d => d.value !== null));
-            
-            series.bias20.setData(dates.map((date, i) => ({
-                time: date, value: chartData.bias.bias20[i]
-            })).filter(d => d.value !== null));
+            series.bias5.setData(dates.map((date, i) => ({ time: date, value: chartData.bias.bias5[i] })).filter(d => d.value !== null));
+            series.bias10.setData(dates.map((date, i) => ({ time: date, value: chartData.bias.bias10[i] })).filter(d => d.value !== null));
+            series.bias20.setData(dates.map((date, i) => ({ time: date, value: chartData.bias.bias20[i] })).filter(d => d.value !== null));
             
             charts.bias.timeScale().fitContent();
         }
@@ -1088,16 +1692,13 @@
             container.innerHTML = '';
             charts.williams = LightweightCharts.createChart(container, { ...chartOptions, height: 200 });
             
-            // Overbought/oversold
             const ob = charts.williams.addLineSeries({ color: 'rgba(248, 81, 73, 0.3)', lineWidth: 1, lineStyle: 2 });
             const os = charts.williams.addLineSeries({ color: 'rgba(63, 185, 80, 0.3)', lineWidth: 1, lineStyle: 2 });
             ob.setData(dates.map(d => ({ time: d, value: -20 })));
             os.setData(dates.map(d => ({ time: d, value: -80 })));
             
             series.williams = charts.williams.addLineSeries({ color: colors.williams, lineWidth: 2 });
-            series.williams.setData(dates.map((date, i) => ({
-                time: date, value: chartData.williams[i]
-            })).filter(d => d.value !== null));
+            series.williams.setData(dates.map((date, i) => ({ time: date, value: chartData.williams[i] })).filter(d => d.value !== null));
             
             charts.williams.timeScale().fitContent();
         }
@@ -1140,6 +1741,13 @@
         
         function hideError() {
             document.getElementById('errorMessage').classList.remove('show');
+        }
+        
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = `toast show ${type}`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
     </script>
 </body>
