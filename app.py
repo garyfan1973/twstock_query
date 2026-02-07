@@ -257,9 +257,10 @@ def get_stock_info(symbol: str) -> dict:
         change = current_price - prev_close
         change_pct = (change / prev_close) * 100
         
+        stock_code = symbol.replace('.TW', '').replace('.TWO', '')
         return {
-            "symbol": symbol.replace('.TW', '').replace('.TWO', ''),
-            "name": info.get('longName', info.get('shortName', symbol)),
+            "symbol": stock_code,
+            "name": STOCK_DATABASE.get(stock_code, info.get('longName', info.get('shortName', symbol))),
             "current_price": round(current_price, 2),
             "prev_close": round(prev_close, 2),
             "change": round(change, 2),
